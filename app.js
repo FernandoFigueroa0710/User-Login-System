@@ -6,11 +6,12 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
-const expressValidator = require("express-validator");
 const localStrategy = require("passport-local").Strategy;
+const expressValidator = require("express-validator");
 const multer = require("multer");
 const uploads = multer({ dest: "./uploads" });
 const flash = require("connect-flash");
+const bcrypt = require("bcryptjs");
 const mongo = require("mongodb");
 const mongoose = require("mongoose");
 
@@ -42,7 +43,7 @@ app.use(
 // passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(flash());
 //Validator
 app.use(
   expressValidator({
