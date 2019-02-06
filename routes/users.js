@@ -7,11 +7,11 @@ router.get("/", (req, res, next) => {
 });
 
 router.get("/register", (req, res, next) => {
-  res.render("register");
+  res.render("register", { title: "Register" });
 });
 
 router.get("/login", (req, res, next) => {
-  res.render("login");
+  res.render("login", { title: "Login" });
 });
 
 module.exports = router;
