@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "./uploads" });
 const passport = require("passport");
-const localStrategy = require("passport-local").Strategy;
+const LocalStrategy = require("passport-local").Strategy;
 const User = require("../models/user");
 
 /* GET users listing. */
@@ -29,6 +29,35 @@ router.post(
     req.flash("sucess", "You are now logged in");
     res.redirect("/");
   }
+);
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.getUserById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    User.getUserByUsername(username, (err, user) => {
+      if (err) throw err;
+      if (!user) {
+        return done(null, false, { message: "Unknown User" });
+      }
+      User.comparePassword(password, user.password, (err, isMatch) => {
+        if (err) return done(err);
+        if (isMatch) {
+          return done(null, user);
+        } else {
+          return done(null, false, { message: "Invalid Password" });
+        }
+      });
+    });
+  })
 );
 
 router.post("/register", upload.single("profileimage"), (req, res, next) => {
@@ -84,4 +113,9 @@ router.post("/register", upload.single("profileimage"), (req, res, next) => {
   }
 });
 
+router.get("/logout", (req, res) => {
+  req.logout();
+  req.flash("sucess", "You are now logged out");
+  res.redirect("/users/login");
+});
 module.exports = router;
